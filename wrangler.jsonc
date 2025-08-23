@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "divyam-personal-blog",
+  "main": "./dist/_worker.js/index.js",
+  "compatibility_date": "2025-08-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist"
+  }
+}

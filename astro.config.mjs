@@ -2,7 +2,6 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
-import prefetch from '@astrojs/prefetch';
 
 import cloudflare from '@astrojs/cloudflare';
 
@@ -11,11 +10,7 @@ export default defineConfig({
 
   integrations: [
     mdx(), 
-    sitemap(),
-    prefetch({
-      selector: 'a[href^="/"]', // Only prefetch internal links
-      throttle: 3,
-    })
+    sitemap()
   ],
 
   // Enhanced prefetch configuration
