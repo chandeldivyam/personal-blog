@@ -14,11 +14,7 @@ export default defineConfig({
   ],
 
   // Enhanced prefetch configuration
-  prefetch: {
-    prefetchAll: false, // More selective prefetching
-    defaultStrategy: 'hover', // Prefetch on hover for better performance
-  },
-
+  prefetch: true,
   markdown: {
     shikiConfig: {
       theme: 'github-dark-dimmed',
