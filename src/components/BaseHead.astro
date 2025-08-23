@@ -43,7 +43,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <meta property="twitter:image" content={new URL(image, Astro.url)} />
 
 <!-- RSS -->
-<link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/rss.xml" />
+<link rel="alternate" type="application/rss+xml" title={title} href={new URL('rss.xml', Astro.site)} />
 
 <!-- Theme Script - Must run before page renders to prevent flash -->
 <script is:inline>
