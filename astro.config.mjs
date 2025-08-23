@@ -31,6 +31,9 @@ export default defineConfig({
       rollupOptions: {
         output: { assetFileNames: 'assets/[hash][extname]' }
       }
+    },
+    server: {
+      allowedHosts: ['720a7673ec40.ngrok-free.app']
     }
   }
 });

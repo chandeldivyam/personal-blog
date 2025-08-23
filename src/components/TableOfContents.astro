@@ -173,7 +173,7 @@ const showToc = tocHeadings.length >= 3;
 
   .toc-link.active {
     color: var(--color-accent);
-    background: rgba(0, 102, 204, 0.1);
+    background: rgba(204, 82, 0, 0.1);
     border-left-color: var(--color-accent);
     font-weight: 600;
   }
@@ -255,130 +255,193 @@ const showToc = tocHeadings.length >= 3;
 </style>
 
 <script>
-  // Use a more TypeScript-friendly approach without extending Window
+  interface TocHandler {
+    observer: IntersectionObserver | null;
+    headingElements: Element[];
+    contentEndElement: Element | null;
+    init: () => void;
+    setupToggle: () => void;
+    setupScrollSpy: () => void;
+    setupSmoothScrolling: () => void;
+    setActiveLink: (id: string | null | undefined) => void;
+    cleanup: () => void;
+  }
+
   const TOC_KEY = '__tocHandler';
-  
-  // Store the handlers using a key that TypeScript won't complain about
-  if (!(window as any)[TOC_KEY]) {
-    (window as any)[TOC_KEY] = {
+
+  declare global {
+    interface Window {
+      [TOC_KEY]?: TocHandler;
+    }
+  }
+
+  if (!window[TOC_KEY]) {
+    window[TOC_KEY] = {
       observer: null,
       headingElements: [],
-      
+      contentEndElement: null,
+
       init: function() {
         this.setupToggle();
         this.setupScrollSpy();
         this.setupSmoothScrolling();
       },
-      
+
       setupToggle: function() {
         const toggle = document.getElementById('toc-toggle');
         const content = document.getElementById('toc-content');
-        
         if (!toggle || !content) return;
-        
+
         toggle.addEventListener('click', () => {
           const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
-          
-          if (isExpanded) {
-            content.classList.remove('expanded');
-            toggle.setAttribute('aria-expanded', 'false');
-          } else {
-            content.classList.add('expanded');
-            toggle.setAttribute('aria-expanded', 'true');
-          }
+          toggle.setAttribute('aria-expanded', String(!isExpanded));
+          content.classList.toggle('expanded', !isExpanded);
         });
       },
-      
+
       setupScrollSpy: function() {
-        // Get all headings in the article content
         const articleContent = document.querySelector('.article-content');
         if (!articleContent) return;
-        
+
         this.headingElements = Array.from(
           articleContent.querySelectorAll('h2[id], h3[id], h4[id]')
         );
-        
         if (this.headingElements.length === 0) return;
-        
-        // Set up Intersection Observer
+
+        // Find the end of article content (before footer/related sections)
+        this.contentEndElement = document.querySelector('.article-footer');
+
+        // Improved observer with better threshold handling
         const observerOptions = {
-          rootMargin: '-100px 0px -40% 0px',
-          threshold: 0
+          rootMargin: '-20% 0px -70% 0px', // Adjusted for better detection
+          threshold: [0, 0.25, 0.5, 0.75, 1], // Multiple thresholds for better accuracy
         };
-        
-        this.observer = new IntersectionObserver((entries) => {
-          // Find the heading that's most visible
-          let mostVisibleEntry = null;
-          let maxRatio = 0;
-          
+
+        this.observer = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
+          // Check if we've scrolled past the article content
+          if (this.contentEndElement) {
+            const footerRect = this.contentEndElement.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            
+            // If footer is in the upper half of viewport, we're past article content
+            if (footerRect.top < viewportHeight * 0.5) {
+              // Keep the last heading active or clear all
+              const lastHeading = this.headingElements[this.headingElements.length - 1];
+              if (lastHeading) {
+                this.setActiveLink(lastHeading.id);
+              }
+              return;
+            }
+          }
+
+          // Find the heading that's most visible in the viewport
+          let mostVisibleEntry: IntersectionObserverEntry | null = null;
+          let highestRatio = 0;
+          let topMostEntry: IntersectionObserverEntry | null = null;
+          let topMostPosition = Infinity;
+
           entries.forEach(entry => {
-            if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
-              maxRatio = entry.intersectionRatio;
+            const rect = entry.target.getBoundingClientRect();
+            
+            // Track the topmost visible heading
+            if (entry.isIntersecting && rect.top < topMostPosition && rect.top >= 0) {
+              topMostPosition = rect.top;
+              topMostEntry = entry;
+            }
+
+            // Track the most visible heading
+            if (entry.isIntersecting && entry.intersectionRatio > highestRatio) {
+              highestRatio = entry.intersectionRatio;
               mostVisibleEntry = entry;
             }
           });
-          
-          // If we have a most visible heading, highlight its ToC link
-          if (mostVisibleEntry) {
+
+          // Prioritize the topmost visible heading if it's near the top of viewport
+          if (topMostEntry && topMostPosition < 200) {
+            this.setActiveLink(topMostEntry.target.id);
+          } else if (mostVisibleEntry) {
             this.setActiveLink(mostVisibleEntry.target.id);
           } else {
-            // Check if we're at the top or bottom of the page
+            // Fallback: find which heading we're currently scrolled past
             const scrollTop = window.scrollY;
-            const documentHeight = document.documentElement.scrollHeight;
-            const windowHeight = window.innerHeight;
+            let activeId = null;
             
-            if (scrollTop < 200) {
-              // Near top - highlight first heading
-              this.setActiveLink(this.headingElements[0]?.id);
-            } else if (scrollTop + windowHeight >= documentHeight - 100) {
-              // Near bottom - highlight last heading
-              this.setActiveLink(this.headingElements[this.headingElements.length - 1]?.id);
+            for (let i = this.headingElements.length - 1; i >= 0; i--) {
+              const heading = this.headingElements[i] as HTMLElement;
+              if (heading.offsetTop <= scrollTop + 150) {
+                activeId = heading.id;
+                break;
+              }
+            }
+            
+            if (activeId) {
+              this.setActiveLink(activeId);
             }
           }
         }, observerOptions);
-        
-        // Start observing all headings
-        this.headingElements.forEach(heading => {
-          this.observer.observe(heading);
-        });
+
+        this.headingElements.forEach(heading => this.observer?.observe(heading));
       },
-      
-      setActiveLink: function(activeId: string) {
-        const tocLinks = document.querySelectorAll('.toc-link');
-        
-        tocLinks.forEach(link => {
+
+      setActiveLink: function(activeId: string | null | undefined) {
+        document.querySelectorAll('.toc-link').forEach(link => {
           const target = link.getAttribute('data-target');
           if (target === activeId) {
             link.classList.add('active');
+            
+            // Ensure the active link is visible in the ToC scroll area
+            const tocList = document.querySelector('.toc-list');
+            if (tocList && link instanceof HTMLElement) {
+              const tocRect = tocList.getBoundingClientRect();
+              const linkRect = link.getBoundingClientRect();
+              
+              if (linkRect.top < tocRect.top || linkRect.bottom > tocRect.bottom) {
+                link.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+            }
           } else {
             link.classList.remove('active');
           }
         });
       },
-      
+
       setupSmoothScrolling: function() {
-        const tocLinks = document.querySelectorAll('.toc-link');
-        
-        tocLinks.forEach(link => {
+        document.querySelectorAll('.toc-link').forEach(link => {
           link.addEventListener('click', (e) => {
             e.preventDefault();
-            
             const targetId = link.getAttribute('data-target');
-            const targetElement = document.getElementById(targetId || '');
-            
+            if (!targetId) return;
+
+            const targetElement = document.getElementById(targetId);
             if (targetElement) {
-              const offset = 100; // Account for fixed header
-              const elementPosition = targetElement.offsetTop - offset;
-              
+              // Calculate offset accounting for sticky header
+              const offset = 100;
+              const elementPosition = targetElement.getBoundingClientRect().top + window.scrollY - offset;
+
+              // Temporarily disable the observer during programmatic scroll
+              const observer = this.observer;
+              if (observer) {
+                observer.disconnect();
+              }
+
+              // Immediately set active state
+              this.setActiveLink(targetId);
+
               window.scrollTo({
                 top: elementPosition,
                 behavior: 'smooth'
               });
-              
+
+              // Re-enable observer after scroll completes
+              setTimeout(() => {
+                if (observer && this.headingElements.length > 0) {
+                  this.headingElements.forEach(heading => observer.observe(heading));
+                }
+              }, 1000);
+
               // Close mobile ToC after clicking
               const toggle = document.getElementById('toc-toggle');
               const content = document.getElementById('toc-content');
-              
               if (toggle && content && window.innerWidth < 1200) {
                 content.classList.remove('expanded');
                 toggle.setAttribute('aria-expanded', 'false');
@@ -387,27 +450,23 @@ const showToc = tocHeadings.length >= 3;
           });
         });
       },
-      
+
       cleanup: function() {
         if (this.observer) {
           this.observer.disconnect();
           this.observer = null;
         }
         this.headingElements = [];
+        this.contentEndElement = null;
       }
     };
   }
 
-  // Function to attach the ToC functionality
   function attachTableOfContents() {
-    const handler = (window as any)[TOC_KEY];
+    const handler = window[TOC_KEY];
     const tocContainer = document.querySelector('.toc-container');
-    
     if (handler && tocContainer) {
-      // Clean up previous instance
       handler.cleanup();
-      
-      // Initialize new instance
       handler.init();
     }
   }

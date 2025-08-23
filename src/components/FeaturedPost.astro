@@ -1,0 +1,244 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import OptimizedImage from './OptimizedImage.astro';
+import { formatDate } from '../lib/utils';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+---
+
+<section class="featured-hero">
+  <div class="hero-content">
+    {post.data.heroImage && (
+      <div class="hero-image">
+        <OptimizedImage
+          src={post.data.heroImage}
+          alt={`Hero image for ${post.data.title}`}
+          width={600}
+          height={400}
+          loading="eager"
+        />
+      </div>
+    )}
+    
+    <div class="hero-text">
+      <div class="hero-text-content">
+        <div class="post-meta">
+          <time datetime={post.data.pubDate.toISOString()}>
+            {formatDate(post.data.pubDate)}
+          </time>
+        </div>
+        
+        <h1 class="hero-title">
+          {post.data.title}
+        </h1>
+        
+        <p class="hero-description">
+          {post.data.description}
+        </p>
+        
+        <div class="hero-actions">
+          <a href={`/blog/${post.slug}/`} class="cta-button">
+            Read Article
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m9 18 6-6-6-6"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .featured-hero {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: var(--space-xl);
+    padding-left: var(--space-mobile-lg);
+    padding-right: var(--space-mobile-lg);
+    padding-bottom: var(--space-mobile-lg);
+  }
+
+  .hero-image {
+    order: 1;
+  }
+
+  .hero-image img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+  }
+
+  .hero-text {
+    order: 2;
+    display: flex;
+    align-items: center;
+  }
+
+  .hero-text-content {
+    max-width: 500px;
+  }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-md);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .separator {
+    opacity: 0.5;
+  }
+
+  .hero-title {
+    font-size: var(--font-size-4xl);
+    line-height: var(--line-height-tight);
+    margin-bottom: var(--space-md);
+    color: var(--color-text);
+    font-weight: 700;
+  }
+
+  .hero-description {
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-lg);
+    max-width: 480px;
+  }
+
+  .hero-actions {
+    margin-top: var(--space-lg);
+  }
+
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    background-color: var(--color-accent);
+    color: white;
+    padding: var(--space-md);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: var(--font-size-base);
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .cta-button:hover {
+    background-color: var(--color-accent);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+    opacity: 0.9;
+  }
+
+  .cta-button svg {
+    transition: transform 0.2s ease;
+  }
+
+  .cta-button:hover svg {
+    transform: translateX(2px);
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .hero-content {
+      grid-template-columns: 1fr;
+      gap: var(--space-mobile-lg);
+      padding: 0 var(--space-mobile-md);
+      min-height: auto;
+    }
+
+    .hero-image {
+      order: 1;
+    }
+
+    .hero-text {
+      order: 2;
+    }
+
+    .hero-title {
+      font-size: var(--font-size-mobile-3xl);
+      margin-bottom: var(--space-mobile-md);
+      line-height: 1.2;
+    }
+
+    .hero-description {
+      font-size: var(--font-size-mobile-lg);
+      margin-bottom: var(--space-mobile-lg);
+      line-height: var(--line-height-mobile-relaxed);
+    }
+
+    .post-meta {
+      margin-bottom: var(--space-mobile-md);
+      gap: var(--space-mobile-sm);
+    }
+
+    .hero-actions {
+      margin-top: var(--space-mobile-lg);
+    }
+
+    .cta-button {
+      padding: var(--space-mobile-sm);
+    }
+
+    .hero-image img {
+      height: 250px;
+    }
+  }
+
+  /* Large screens - make content area wider */
+  @media (min-width: 1200px) {
+    .hero-content {
+      max-width: 1400px;
+      gap: calc(var(--space-xl) * 2);
+    }
+
+    .hero-title {
+      font-size: 3rem;
+    }
+
+    .hero-description {
+      font-size: 1.25rem;
+    }
+  }
+
+  /* Extra small screens */
+  @media (max-width: 480px) {
+    .hero-content {
+      padding: var(--space-mobile-lg) var(--space-mobile-sm);
+    }
+
+    .hero-title {
+      font-size: var(--font-size-mobile-2xl);
+    }
+
+    .hero-image img {
+      height: 200px;
+    }
+  }
+</style>
