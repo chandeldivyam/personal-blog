@@ -1,0 +1,162 @@
+---
+export interface Props {
+  className?: string;
+}
+
+const { className = '' } = Astro.props;
+---
+
+<button
+  id="back-to-top"
+  type="button"
+  class={`back-to-top ${className}`}
+  aria-label="Back to top"
+  title="Back to top"
+>
+  <svg class="back-to-top-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+    <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+  </svg>
+</button>
+
+<style>
+  .back-to-top {
+    position: fixed;
+    bottom: var(--space-lg);
+    right: var(--space-lg);
+    z-index: 1000;
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-md);
+  }
+
+  .back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .back-to-top:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 102, 204, 0.3);
+  }
+
+  .back-to-top:active {
+    transform: translateY(0);
+    transition-duration: 0.1s;
+  }
+
+  .back-to-top-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .back-to-top:hover .back-to-top-icon {
+    transform: translateY(-1px);
+  }
+
+  /* Reduce motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce) {
+    .back-to-top {
+      transform: none;
+    }
+    
+    .back-to-top.visible {
+      transform: none;
+    }
+    
+    .back-to-top:hover {
+      transform: none;
+    }
+    
+    .back-to-top-icon {
+      transition: none;
+    }
+    
+    .back-to-top:hover .back-to-top-icon {
+      transform: none;
+    }
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    .back-to-top {
+      bottom: var(--space-md);
+      right: var(--space-md);
+      width: 44px;
+      height: 44px;
+    }
+  }
+
+  /* Dark theme adjustments */
+  [data-theme="dark"] .back-to-top:hover {
+    box-shadow: 0 8px 25px rgba(102, 179, 255, 0.3);
+  }
+</style>
+
+<script>
+  // Use a more TypeScript-friendly approach without extending Window
+  const BACK_TO_TOP_KEY = '__backToTopHandler';
+  
+  // Store the handlers using a key that TypeScript won't complain about
+  if (!(window as any)[BACK_TO_TOP_KEY]) {
+    (window as any)[BACK_TO_TOP_KEY] = {
+      scroll: function() {
+        const button = document.getElementById('back-to-top');
+        if (!button) return;
+        
+        const scrolled = window.scrollY;
+        const threshold = 300; // Show after 300px of scrolling
+        
+        if (scrolled > threshold) {
+          button.classList.add('visible');
+        } else {
+          button.classList.remove('visible');
+        }
+      },
+      
+      click: function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }
+    };
+  }
+
+  // Function to attach the event listeners
+  function attachBackToTop() {
+    const button = document.getElementById('back-to-top');
+    const handlers = (window as any)[BACK_TO_TOP_KEY];
+    
+    if (button && handlers) {
+      // Remove any existing listeners first
+      button.removeEventListener('click', handlers.click);
+      window.removeEventListener('scroll', handlers.scroll);
+      
+      // Add the listeners
+      button.addEventListener('click', handlers.click);
+      window.addEventListener('scroll', handlers.scroll);
+      
+      // Initial check
+      handlers.scroll();
+    }
+  }
+
+  // Attach on initial load
+  attachBackToTop();
+
+  // Re-attach after each navigation with View Transitions
+  document.addEventListener('astro:after-swap', attachBackToTop);
+</script>

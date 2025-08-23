@@ -1,0 +1,62 @@
+---
+export interface Props {
+  minutes: number;
+  words: number;
+  text: string;
+  showWords?: boolean;
+  className?: string;
+}
+
+const { minutes, words, text, showWords = false, className = '' } = Astro.props;
+---
+
+<div class={`reading-time ${className}`}>
+  <svg class="reading-time-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+    <path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm0-13a6 6 0 100 12A6 6 0 008 2z"/>
+    <path fill-rule="evenodd" d="M8 3a.5.5 0 01.5.5v4.21l2.72 1.36a.5.5 0 01-.44.88L8 8.5a.5.5 0 01-.5-.5V3.5A.5.5 0 018 3z"/>
+  </svg>
+  <span class="reading-time-text">{text}</span>
+  {showWords && (
+    <span class="reading-time-words">({words} words)</span>
+  )}
+</div>
+
+<style>
+  .reading-time {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .reading-time-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+
+  .reading-time-text {
+    white-space: nowrap;
+  }
+
+  .reading-time-words {
+    opacity: 0.7;
+    font-size: 0.8125rem;
+    font-weight: normal;
+  }
+
+  /* Hover effect */
+  .reading-time:hover .reading-time-icon {
+    opacity: 1;
+  }
+
+  /* Accessible focus styles */
+  .reading-time:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: var(--border-radius);
+  }
+</style>

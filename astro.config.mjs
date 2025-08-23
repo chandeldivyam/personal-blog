@@ -2,14 +2,22 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import prefetch from '@astrojs/prefetch';
 
 export default defineConfig({
   site: 'https://divyam.site',
-  integrations: [mdx(), sitemap()],
-  // Built-in prefetch
+  integrations: [
+    mdx(), 
+    sitemap(),
+    prefetch({
+      selector: 'a[href^="/"]', // Only prefetch internal links
+      throttle: 3,
+    })
+  ],
+  // Enhanced prefetch configuration
   prefetch: {
-    prefetchAll: true,
-    defaultStrategy: 'viewport' // or 'hover' | 'tap' | 'load'
+    prefetchAll: false, // More selective prefetching
+    defaultStrategy: 'hover', // Prefetch on hover for better performance
   },
   markdown: {
     shikiConfig: {

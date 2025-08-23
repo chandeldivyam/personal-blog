@@ -1,13 +1,25 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import ReadingTime from '../components/ReadingTime.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../lib/config';
-import { formatDate } from '../lib/utils';
+import { formatDate, readingTime } from '../lib/utils';
 
 const posts = (await getCollection('blog'))
   .filter((post) => !post.data.draft)
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 3);
+
+// Calculate reading time for each post
+const postsWithReadingTime = await Promise.all(
+  posts.map(async (post) => {
+    const { body } = post;
+    return {
+      ...post,
+      readTime: readingTime(body)
+    };
+  })
+);
 ---
 
 <Base title={SITE_TITLE} description={SITE_DESCRIPTION}>
@@ -22,9 +34,9 @@ const posts = (await getCollection('blog'))
 
     <section class="recent-posts">
       <h2 class="section-title">Recent Posts</h2>
-      {posts.length > 0 ? (
+      {postsWithReadingTime.length > 0 ? (
         <div class="posts-grid">
-          {posts.map((post) => (
+          {postsWithReadingTime.map((post) => (
             <article class="post-card">
               <a href={`/blog/${post.slug}/`} class="post-card-link">
                 <h3 class="post-title">
@@ -32,9 +44,13 @@ const posts = (await getCollection('blog'))
                 </h3>
                 <p class="post-description">{post.data.description}</p>
                 <div class="post-meta">
-                  <time datetime={post.data.pubDate.toISOString()}>
-                    {formatDate(post.data.pubDate)}
-                  </time>
+                  <div class="post-meta-left">
+                    <time datetime={post.data.pubDate.toISOString()}>
+                      {formatDate(post.data.pubDate)}
+                    </time>
+                    <span class="separator">•</span>
+                    <ReadingTime {...post.readTime} />
+                  </div>
                   {post.data.tags && post.data.tags.length > 0 && (
                     <div class="post-tags">
                       {post.data.tags.slice(0, 3).map((tag) => (
@@ -51,7 +67,7 @@ const posts = (await getCollection('blog'))
         <p class="no-posts">No posts yet. Check back soon!</p>
       )}
       
-      {posts.length > 0 && (
+      {postsWithReadingTime.length > 0 && (
         <div class="view-all">
           <a href="/blog" class="view-all-link">View all posts →</a>
         </div>
@@ -100,7 +116,6 @@ const posts = (await getCollection('blog'))
   .post-card {
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   .post-card:hover {
@@ -146,6 +161,16 @@ const posts = (await getCollection('blog'))
     color: var(--color-text-secondary);
   }
 
+  .post-meta-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .separator {
+    opacity: 0.5;
+  }
+
   .post-tags {
     display: flex;
     gap: var(--space-xs);
@@ -177,12 +202,66 @@ const posts = (await getCollection('blog'))
     color: var(--color-accent);
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.2s ease;
   }
 
   .view-all-link:hover {
     text-decoration: none;
     opacity: 0.8;
+  }
+
+  /* Mobile improvements */
+  @media (max-width: 768px) {
+    .hero {
+      padding: var(--space-mobile-xl) 0;
+      margin-bottom: var(--space-mobile-xl);
+    }
+    
+    .hero-title {
+      font-size: var(--font-size-mobile-3xl);
+      margin-bottom: var(--space-mobile-md);
+      line-height: 1.2;
+    }
+    
+    .hero-description {
+      font-size: var(--font-size-mobile-lg);
+      line-height: var(--line-height-mobile-relaxed);
+    }
+    
+    .recent-posts {
+      margin-bottom: var(--space-mobile-xl);
+    }
+    
+    .section-title {
+      font-size: var(--font-size-mobile-2xl);
+      margin-bottom: var(--space-mobile-lg);
+    }
+    
+    .posts-grid {
+      gap: var(--space-mobile-lg);
+      margin-bottom: var(--space-mobile-lg);
+    }
+    
+    .post-card-link {
+      padding: var(--space-mobile-md);
+    }
+    
+    .post-title {
+      font-size: var(--font-size-mobile-xl);
+      margin-bottom: var(--space-mobile-sm);
+    }
+    
+    .post-description {
+      margin-bottom: var(--space-mobile-md);
+      line-height: var(--line-height-mobile-relaxed);
+    }
+    
+    .post-meta-left {
+      gap: var(--space-mobile-sm);
+    }
+    
+    .post-tags {
+      gap: var(--space-mobile-sm);
+    }
   }
 
   @media (min-width: 768px) {

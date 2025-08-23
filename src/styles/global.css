@@ -32,7 +32,10 @@ html {
   font-family: var(--font-sans);
   background-color: var(--color-bg);
   color: var(--color-text);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'kern' 1;
 }
 
 body {
@@ -40,11 +43,36 @@ body {
   line-height: var(--line-height-normal);
 }
 
+/* Mobile typography improvements */
+@media (max-width: 768px) {
+  body {
+    font-size: var(--font-size-mobile-base);
+    line-height: var(--line-height-mobile-relaxed);
+  }
+  
+  h1 { font-size: var(--font-size-mobile-4xl); }
+  h2 { font-size: var(--font-size-mobile-3xl); }
+  h3 { font-size: var(--font-size-mobile-2xl); }
+  h4 { font-size: var(--font-size-mobile-xl); }
+  h5 { font-size: var(--font-size-mobile-lg); }
+  h6 { font-size: var(--font-size-mobile-base); }
+  
+  p {
+    margin-bottom: var(--space-mobile-md);
+    line-height: var(--line-height-mobile-relaxed);
+  }
+}
+
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
   line-height: var(--line-height-tight);
   font-weight: 600;
   color: var(--color-text);
+}
+
+/* Scroll padding for anchor links */
+h2[id], h3[id], h4[id] {
+  scroll-margin-top: 120px; /* Account for fixed header + some padding */
 }
 
 h1 { font-size: var(--font-size-4xl); }
@@ -62,7 +90,6 @@ p {
 a {
   color: var(--color-accent);
   text-decoration: none;
-  transition: color 0.2s ease;
 }
 
 a:hover {
@@ -125,6 +152,34 @@ hr {
   outline-offset: 2px;
 }
 
+/* Touch-friendly improvements */
+@media (max-width: 768px) {
+  /* Increase touch target sizes */
+  a, button {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Improve text selection on mobile */
+  body {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: rgba(0, 102, 204, 0.1);
+  }
+  
+  /* Better scrolling on iOS */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent zoom on input focus on iOS */
+  input, textarea, select {
+    font-size: 16px;
+  }
+}
+
 /* Selection */
 ::selection {
   background-color: var(--color-accent);
@@ -148,6 +203,12 @@ hr {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 var(--space-md);
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 var(--space-mobile-md);
+  }
 }
 
 @media (min-width: 768px) {

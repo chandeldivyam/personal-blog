@@ -1,5 +1,8 @@
 ---
 import Base from './Base.astro';
+import ReadingTime from '../components/ReadingTime.astro';
+import SocialShare from '../components/SocialShare.astro';
+import TableOfContents from '../components/TableOfContents.astro';
 import { formatDate, readingTime } from '../lib/utils';
 
 export interface Props {
@@ -14,6 +17,9 @@ export interface Props {
 const { title, description, pubDate, updatedDate, tags = [], image } = Astro.props;
 const content = await Astro.slots.render('default');
 const readTime = readingTime(content);
+
+// Get headings for table of contents
+const { headings } = Astro.props as any;
 ---
 
 <Base title={title} description={description} image={image}>
@@ -27,7 +33,7 @@ const readTime = readingTime(content);
           {formatDate(pubDate)}
         </time>
         <span class="separator">•</span>
-        <span class="reading-time">{readTime}</span>
+        <ReadingTime {...readTime} />
         {updatedDate && (
           <>
             <span class="separator">•</span>
@@ -49,9 +55,17 @@ const readTime = readingTime(content);
       )}
     </header>
     
+    <TableOfContents headings={headings} />
+    
     <div class="article-content">
       <slot />
     </div>
+    
+    <SocialShare 
+      title={title} 
+      url={Astro.url.href} 
+      description={description}
+    />
   </article>
 </Base>
 
@@ -108,6 +122,17 @@ const readTime = readingTime(content);
     line-height: var(--line-height-relaxed);
   }
 
+  /* Desktop layout adjustments for ToC */
+  @media (min-width: 1200px) {
+    .container {
+      max-width: 1200px;
+    }
+    
+    .article-content {
+      margin-right: 320px; /* Make room for ToC */
+    }
+  }
+
   .article-content :global(h2),
   .article-content :global(h3),
   .article-content :global(h4) {
@@ -145,12 +170,96 @@ const readTime = readingTime(content);
   }
 
   @media (max-width: 768px) {
+    .article-header {
+      margin-bottom: var(--space-mobile-lg);
+      padding-bottom: var(--space-mobile-md);
+    }
+    
     .article-title {
-      font-size: var(--font-size-3xl);
+      font-size: var(--font-size-mobile-3xl);
+      margin-bottom: var(--space-mobile-md);
+      line-height: 1.2;
+    }
+
+    .article-description {
+      font-size: var(--font-size-mobile-lg);
+      margin-bottom: var(--space-mobile-lg);
+      line-height: var(--line-height-mobile-relaxed);
     }
 
     .article-meta {
       flex-wrap: wrap;
+      gap: var(--space-mobile-sm);
+      margin-bottom: var(--space-mobile-md);
+    }
+    
+    .article-content {
+      line-height: var(--line-height-mobile-relaxed);
+    }
+  }
+  
+  /* Mobile content spacing improvements */
+  @media (max-width: 768px) {
+    .article-content :global(h2),
+    .article-content :global(h3),
+    .article-content :global(h4) {
+      margin-top: var(--space-mobile-xl);
+      margin-bottom: var(--space-mobile-md);
+    }
+
+    .article-content :global(h2:first-child),
+    .article-content :global(h3:first-child),
+    .article-content :global(h4:first-child) {
+      margin-top: 0;
+    }
+    
+    .article-content :global(p) {
+      margin-bottom: var(--space-mobile-md);
+    }
+    
+    .article-content :global(ul),
+    .article-content :global(ol) {
+      margin-bottom: var(--space-mobile-md);
+      padding-left: var(--space-mobile-lg);
+    }
+    
+    .article-content :global(li) {
+      margin-bottom: var(--space-mobile-sm);
+    }
+    
+    .article-content :global(blockquote) {
+      margin: var(--space-mobile-lg) 0;
+      padding-left: var(--space-mobile-md);
+    }
+    
+    .article-content :global(pre) {
+      margin: var(--space-mobile-md) calc(-1 * var(--space-mobile-md));
+      padding: var(--space-mobile-md);
+      border-radius: 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .article-content :global(code) {
+      word-break: break-word;
+    }
+    
+    .article-content :global(img) {
+      margin: var(--space-mobile-lg) 0;
+    }
+    
+    .article-content :global(table) {
+      font-size: 0.875rem;
+      margin: var(--space-mobile-lg) calc(-1 * var(--space-mobile-md));
+      width: calc(100% + 2 * var(--space-mobile-md));
+      overflow-x: auto;
+      display: block;
+      white-space: nowrap;
+    }
+    
+    .article-content :global(th),
+    .article-content :global(td) {
+      padding: var(--space-mobile-sm);
     }
   }
 </style>

@@ -1,0 +1,428 @@
+---
+export interface Props {
+  headings?: Array<{
+    depth: number;
+    slug: string;
+    text: string;
+  }>;
+  className?: string;
+}
+
+const { headings = [], className = '' } = Astro.props;
+
+// Filter to only include h2, h3, h4 headings and ensure minimum headings for ToC
+const tocHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 4);
+const showToc = tocHeadings.length >= 3;
+---
+
+{showToc && (
+  <div class={`toc-container ${className}`}>
+    <!-- Mobile toggle button -->
+    <button
+      type="button"
+      id="toc-toggle"
+      class="toc-toggle"
+      aria-expanded="false"
+      aria-controls="toc-content"
+      aria-label="Toggle table of contents"
+    >
+      <svg class="toc-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z"/>
+      </svg>
+      <span class="toc-toggle-text">Table of Contents</span>
+      <svg class="toc-chevron" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+      </svg>
+    </button>
+
+    <!-- Table of contents content -->
+    <nav id="toc-content" class="toc-content" aria-label="Table of contents">
+      <div class="toc-header">
+        <h3 class="toc-title">Table of Contents</h3>
+      </div>
+      <ol class="toc-list">
+        {tocHeadings.map((heading) => (
+          <li class={`toc-item toc-depth-${heading.depth}`}>
+            <a
+              href={`#${heading.slug}`}
+              class="toc-link"
+              data-target={heading.slug}
+            >
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  </div>
+)}
+
+<style>
+  .toc-container {
+    margin: var(--space-lg) 0;
+  }
+
+  /* Mobile toggle button */
+  .toc-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: var(--space-md);
+    background: var(--color-code-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    color: var(--color-text);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .toc-toggle:hover {
+    background: var(--color-border);
+  }
+
+  .toc-toggle[aria-expanded="true"] .toc-chevron {
+    transform: rotate(180deg);
+  }
+
+  .toc-icon {
+    flex-shrink: 0;
+    color: var(--color-accent);
+  }
+
+  .toc-toggle-text {
+    flex: 1;
+    text-align: left;
+  }
+
+  .toc-chevron {
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+
+  /* Table of contents content */
+  .toc-content {
+    display: none;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-top: none;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    overflow: hidden;
+  }
+
+  .toc-content.expanded {
+    display: block;
+    animation: slideDown 0.3s ease-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .toc-header {
+    display: none; /* Hidden on mobile, shown on desktop */
+  }
+
+  .toc-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin: 0;
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+  }
+
+  .toc-list {
+    list-style: none;
+    margin: 0;
+    padding: var(--space-sm) 0;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .toc-item {
+    margin: 0;
+  }
+
+  .toc-link {
+    display: block;
+    padding: var(--space-xs) var(--space-md);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    line-height: var(--line-height-normal);
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+    position: relative;
+  }
+
+  .toc-link:hover {
+    color: var(--color-text);
+    background: var(--color-code-bg);
+    text-decoration: none;
+  }
+
+  .toc-link.active {
+    color: var(--color-accent);
+    background: rgba(0, 102, 204, 0.1);
+    border-left-color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  /* Heading depth indentation */
+  .toc-depth-2 .toc-link {
+    padding-left: var(--space-md);
+  }
+
+  .toc-depth-3 .toc-link {
+    padding-left: calc(var(--space-md) + var(--space-lg));
+  }
+
+  .toc-depth-4 .toc-link {
+    padding-left: calc(var(--space-md) + var(--space-xl));
+  }
+
+  /* Desktop styles */
+  @media (min-width: 1200px) {
+    .toc-container {
+      position: sticky;
+      top: calc(var(--space-xl) + 60px); /* Account for header height */
+      float: right;
+      width: 280px;
+      margin: 0 0 var(--space-lg) var(--space-lg);
+      max-height: calc(100vh - 120px);
+      overflow: hidden;
+    }
+
+    .toc-toggle {
+      display: none;
+    }
+
+    .toc-content {
+      display: block;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .toc-header {
+      display: block;
+    }
+  }
+
+  /* Reduce motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce) {
+    .toc-content.expanded {
+      animation: none;
+    }
+    
+    .toc-chevron {
+      transition: none;
+    }
+    
+    .toc-link {
+      transition: none;
+    }
+  }
+
+  /* Dark theme adjustments */
+  [data-theme="dark"] .toc-link.active {
+    background: rgba(102, 179, 255, 0.1);
+    color: var(--color-accent);
+  }
+
+  /* Print styles */
+  @media print {
+    .toc-container {
+      display: none;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .toc-link.active {
+      border-left-width: 4px;
+    }
+  }
+</style>
+
+<script>
+  // Use a more TypeScript-friendly approach without extending Window
+  const TOC_KEY = '__tocHandler';
+  
+  // Store the handlers using a key that TypeScript won't complain about
+  if (!(window as any)[TOC_KEY]) {
+    (window as any)[TOC_KEY] = {
+      observer: null,
+      headingElements: [],
+      
+      init: function() {
+        this.setupToggle();
+        this.setupScrollSpy();
+        this.setupSmoothScrolling();
+      },
+      
+      setupToggle: function() {
+        const toggle = document.getElementById('toc-toggle');
+        const content = document.getElementById('toc-content');
+        
+        if (!toggle || !content) return;
+        
+        toggle.addEventListener('click', () => {
+          const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+          
+          if (isExpanded) {
+            content.classList.remove('expanded');
+            toggle.setAttribute('aria-expanded', 'false');
+          } else {
+            content.classList.add('expanded');
+            toggle.setAttribute('aria-expanded', 'true');
+          }
+        });
+      },
+      
+      setupScrollSpy: function() {
+        // Get all headings in the article content
+        const articleContent = document.querySelector('.article-content');
+        if (!articleContent) return;
+        
+        this.headingElements = Array.from(
+          articleContent.querySelectorAll('h2[id], h3[id], h4[id]')
+        );
+        
+        if (this.headingElements.length === 0) return;
+        
+        // Set up Intersection Observer
+        const observerOptions = {
+          rootMargin: '-100px 0px -40% 0px',
+          threshold: 0
+        };
+        
+        this.observer = new IntersectionObserver((entries) => {
+          // Find the heading that's most visible
+          let mostVisibleEntry = null;
+          let maxRatio = 0;
+          
+          entries.forEach(entry => {
+            if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+              maxRatio = entry.intersectionRatio;
+              mostVisibleEntry = entry;
+            }
+          });
+          
+          // If we have a most visible heading, highlight its ToC link
+          if (mostVisibleEntry) {
+            this.setActiveLink(mostVisibleEntry.target.id);
+          } else {
+            // Check if we're at the top or bottom of the page
+            const scrollTop = window.scrollY;
+            const documentHeight = document.documentElement.scrollHeight;
+            const windowHeight = window.innerHeight;
+            
+            if (scrollTop < 200) {
+              // Near top - highlight first heading
+              this.setActiveLink(this.headingElements[0]?.id);
+            } else if (scrollTop + windowHeight >= documentHeight - 100) {
+              // Near bottom - highlight last heading
+              this.setActiveLink(this.headingElements[this.headingElements.length - 1]?.id);
+            }
+          }
+        }, observerOptions);
+        
+        // Start observing all headings
+        this.headingElements.forEach(heading => {
+          this.observer.observe(heading);
+        });
+      },
+      
+      setActiveLink: function(activeId: string) {
+        const tocLinks = document.querySelectorAll('.toc-link');
+        
+        tocLinks.forEach(link => {
+          const target = link.getAttribute('data-target');
+          if (target === activeId) {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+      },
+      
+      setupSmoothScrolling: function() {
+        const tocLinks = document.querySelectorAll('.toc-link');
+        
+        tocLinks.forEach(link => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const targetId = link.getAttribute('data-target');
+            const targetElement = document.getElementById(targetId || '');
+            
+            if (targetElement) {
+              const offset = 100; // Account for fixed header
+              const elementPosition = targetElement.offsetTop - offset;
+              
+              window.scrollTo({
+                top: elementPosition,
+                behavior: 'smooth'
+              });
+              
+              // Close mobile ToC after clicking
+              const toggle = document.getElementById('toc-toggle');
+              const content = document.getElementById('toc-content');
+              
+              if (toggle && content && window.innerWidth < 1200) {
+                content.classList.remove('expanded');
+                toggle.setAttribute('aria-expanded', 'false');
+              }
+            }
+          });
+        });
+      },
+      
+      cleanup: function() {
+        if (this.observer) {
+          this.observer.disconnect();
+          this.observer = null;
+        }
+        this.headingElements = [];
+      }
+    };
+  }
+
+  // Function to attach the ToC functionality
+  function attachTableOfContents() {
+    const handler = (window as any)[TOC_KEY];
+    const tocContainer = document.querySelector('.toc-container');
+    
+    if (handler && tocContainer) {
+      // Clean up previous instance
+      handler.cleanup();
+      
+      // Initialize new instance
+      handler.init();
+    }
+  }
+
+  // Attach on initial load
+  attachTableOfContents();
+
+  // Re-attach after each navigation with View Transitions
+  document.addEventListener('astro:after-swap', attachTableOfContents);
+
+  // Clean up on page unload
+  window.addEventListener('beforeunload', () => {
+    const handler = (window as any)[TOC_KEY];
+    if (handler) {
+      handler.cleanup();
+    }
+  });
+</script>
