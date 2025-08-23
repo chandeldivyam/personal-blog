@@ -37,6 +37,4 @@ export default defineConfig({
       allowedHosts: ['720a7673ec40.ngrok-free.app']
     }
   },
-
-  adapter: cloudflare()
 });
