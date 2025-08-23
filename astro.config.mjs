@@ -4,8 +4,11 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import prefetch from '@astrojs/prefetch';
 
+import cloudflare from '@astrojs/cloudflare';
+
 export default defineConfig({
   site: 'https://divyam.site',
+
   integrations: [
     mdx(), 
     sitemap(),
@@ -14,17 +17,20 @@ export default defineConfig({
       throttle: 3,
     })
   ],
+
   // Enhanced prefetch configuration
   prefetch: {
     prefetchAll: false, // More selective prefetching
     defaultStrategy: 'hover', // Prefetch on hover for better performance
   },
+
   markdown: {
     shikiConfig: {
       theme: 'github-dark-dimmed',
       wrap: true
     }
   },
+
   vite: {
     build: {
       cssMinify: 'lightningcss',
@@ -35,5 +41,7 @@ export default defineConfig({
     server: {
       allowedHosts: ['720a7673ec40.ngrok-free.app']
     }
-  }
+  },
+
+  adapter: cloudflare()
 });
