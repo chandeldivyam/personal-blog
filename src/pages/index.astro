@@ -1,0 +1,189 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../lib/config';
+import { formatDate } from '../lib/utils';
+
+const posts = (await getCollection('blog'))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+---
+
+<Base title={SITE_TITLE} description={SITE_DESCRIPTION}>
+  <div class="container">
+    <section class="hero">
+      <h1 class="hero-title">Welcome to My Blog</h1>
+      <p class="hero-description">
+        A minimal, fast, and modern blog built with Astro. 
+        Here I share my thoughts on web development, technology, and life.
+      </p>
+    </section>
+
+    <section class="recent-posts">
+      <h2 class="section-title">Recent Posts</h2>
+      {posts.length > 0 ? (
+        <div class="posts-grid">
+          {posts.map((post) => (
+            <article class="post-card">
+              <h3 class="post-title">
+                <a href={`/blog/${post.slug}/`}>{post.data.title}</a>
+              </h3>
+              <p class="post-description">{post.data.description}</p>
+              <div class="post-meta">
+                <time datetime={post.data.pubDate.toISOString()}>
+                  {formatDate(post.data.pubDate)}
+                </time>
+                {post.data.tags && post.data.tags.length > 0 && (
+                  <div class="post-tags">
+                    {post.data.tags.slice(0, 3).map((tag) => (
+                      <span class="tag">#{tag}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p class="no-posts">No posts yet. Check back soon!</p>
+      )}
+      
+      {posts.length > 0 && (
+        <div class="view-all">
+          <a href="/blog" class="view-all-link">View all posts →</a>
+        </div>
+      )}
+    </section>
+  </div>
+</Base>
+
+<style>
+  .hero {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+    padding: var(--space-xl) 0;
+  }
+
+  .hero-title {
+    font-size: var(--font-size-4xl);
+    margin-bottom: var(--space-md);
+    line-height: var(--line-height-tight);
+  }
+
+  .hero-description {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: var(--line-height-relaxed);
+  }
+
+  .recent-posts {
+    margin-bottom: var(--space-xl);
+  }
+
+  .section-title {
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--space-lg);
+    text-align: center;
+  }
+
+  .posts-grid {
+    display: grid;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+  }
+
+  .post-card {
+    padding: var(--space-lg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .post-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-md);
+  }
+
+  .post-title {
+    margin-bottom: var(--space-sm);
+  }
+
+  .post-title a {
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: var(--font-size-xl);
+  }
+
+  .post-title a:hover {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .post-description {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-md);
+    line-height: var(--line-height-relaxed);
+  }
+
+  .post-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+  }
+
+  .post-tags {
+    display: flex;
+    gap: var(--space-xs);
+  }
+
+  .tag {
+    background-color: var(--color-border);
+    color: var(--color-text-secondary);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--border-radius);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .no-posts {
+    text-align: center;
+    color: var(--color-text-secondary);
+    padding: var(--space-xl);
+  }
+
+  .view-all {
+    text-align: center;
+  }
+
+  .view-all-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .view-all-link:hover {
+    text-decoration: none;
+    opacity: 0.8;
+  }
+
+  @media (min-width: 768px) {
+    .posts-grid {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .hero-title {
+      font-size: var(--font-size-4xl);
+    }
+  }
+</style>

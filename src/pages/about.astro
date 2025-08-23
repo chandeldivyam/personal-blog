@@ -1,0 +1,153 @@
+---
+import Page from '../layouts/Page.astro';
+import { SITE_TITLE } from '../lib/config';
+
+const title = `About - ${SITE_TITLE}`;
+const description = 'Learn more about me and this blog.';
+---
+
+<Page title={title} description={description}>
+  <div class="about-content">
+    <h1>About Me</h1>
+    
+    <div class="intro">
+      <p>
+        Hi there! I'm a passionate web developer who loves creating fast, 
+        accessible, and user-friendly web experiences. This blog is where I 
+        share my thoughts on web development, technology trends, and lessons 
+        learned along the way.
+      </p>
+    </div>
+
+    <section class="section">
+      <h2>What I Do</h2>
+      <ul>
+        <li>Full-stack web development</li>
+        <li>Performance optimization</li>
+        <li>Accessibility consulting</li>
+        <li>Open source contributions</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Technologies I Love</h2>
+      <ul>
+        <li>Astro, React, Vue.js</li>
+        <li>TypeScript, Node.js</li>
+        <li>CSS, Tailwind CSS</li>
+        <li>PostgreSQL, MongoDB</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>About This Blog</h2>
+      <p>
+        This blog is built with <a href="https://astro.build" target="_blank" rel="noopener noreferrer">Astro</a>, 
+        a modern static site generator that prioritizes performance. The design 
+        focuses on readability and minimal distractions, allowing the content 
+        to shine.
+      </p>
+      <p>
+        Some features of this blog:
+      </p>
+      <ul>
+        <li>🚀 Ultra-fast page loads (sub-100ms)</li>
+        <li>🎨 Dark/light theme toggle</li>
+        <li>📱 Fully responsive design</li>
+        <li>♿ Accessibility-first approach</li>
+        <li>📝 MDX support for rich content</li>
+        <li>🔍 SEO optimized</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Get In Touch</h2>
+      <p>
+        Feel free to reach out if you'd like to discuss technology, 
+        collaborate on a project, or just say hello!
+      </p>
+      <ul class="contact-links">
+        <li><a href="mailto:hello@example.com">Email</a></li>
+        <li><a href="https://twitter.com/yourhandle" target="_blank" rel="noopener noreferrer">Twitter</a></li>
+        <li><a href="https://github.com/yourhandle" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+        <li><a href="https://linkedin.com/in/yourprofile" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+      </ul>
+    </section>
+  </div>
+</Page>
+
+<style>
+  .about-content {
+    max-width: 65ch;
+    margin: 0 auto;
+  }
+
+  .intro {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-xl);
+    padding: var(--space-lg);
+    background-color: var(--color-border);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--color-accent);
+  }
+
+  .intro p {
+    margin: 0;
+    line-height: var(--line-height-relaxed);
+  }
+
+  .section {
+    margin-bottom: var(--space-xl);
+  }
+
+  .section h2 {
+    margin-bottom: var(--space-md);
+    color: var(--color-accent);
+  }
+
+  .section ul {
+    line-height: var(--line-height-relaxed);
+  }
+
+  .section li {
+    margin-bottom: var(--space-xs);
+  }
+
+  .contact-links {
+    display: flex;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+  }
+
+  .contact-links a {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--color-border);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    color: var(--color-text);
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .contact-links a:hover {
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    text-decoration: none;
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 768px) {
+    .intro {
+      padding: var(--space-md);
+    }
+
+    .contact-links {
+      justify-content: center;
+    }
+  }
+</style>

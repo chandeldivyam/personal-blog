@@ -1,0 +1,121 @@
+---
+import Page from '../layouts/Page.astro';
+import { SITE_TITLE } from '../lib/config';
+
+const title = `Page Not Found - ${SITE_TITLE}`;
+const description = 'The page you are looking for does not exist.';
+---
+
+<Page title={title} description={description}>
+  <div class="not-found">
+    <div class="error-content">
+      <h1 class="error-code">404</h1>
+      <h2 class="error-title">Page Not Found</h2>
+      <p class="error-description">
+        Sorry, the page you are looking for doesn't exist or has been moved.
+      </p>
+      
+      <div class="error-actions">
+        <a href="/" class="primary-button">Go Home</a>
+        <a href="/blog" class="secondary-button">View Blog</a>
+      </div>
+    </div>
+  </div>
+</Page>
+
+<style>
+  .not-found {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+  }
+
+  .error-content {
+    max-width: 500px;
+  }
+
+  .error-code {
+    font-size: 6rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: var(--space-sm);
+    line-height: 1;
+  }
+
+  .error-title {
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--space-md);
+    color: var(--color-text);
+  }
+
+  .error-description {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-xl);
+    line-height: var(--line-height-relaxed);
+  }
+
+  .error-actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .primary-button, .secondary-button {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+  }
+
+  .primary-button {
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+  }
+
+  .primary-button:hover {
+    background-color: transparent;
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .secondary-button {
+    background-color: transparent;
+    color: var(--color-text);
+    border-color: var(--color-border);
+  }
+
+  .secondary-button:hover {
+    background-color: var(--color-border);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  @media (max-width: 768px) {
+    .error-code {
+      font-size: 4rem;
+    }
+
+    .error-title {
+      font-size: var(--font-size-2xl);
+    }
+
+    .error-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .primary-button, .secondary-button {
+      width: 200px;
+      justify-content: center;
+    }
+  }
+</style>

@@ -1,0 +1,64 @@
+---
+import { SITE_AUTHOR } from '../lib/config';
+---
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <p>&copy; {new Date().getFullYear()} {SITE_AUTHOR}. All rights reserved.</p>
+      
+      <div class="footer-links">
+        <a href="/rss.xml" target="_blank" rel="noopener noreferrer">RSS</a>
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">Twitter</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-xl);
+    padding: var(--space-xl) 0;
+    background-color: var(--color-bg);
+  }
+
+  .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  .footer-content p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: var(--space-md);
+  }
+
+  .footer-links a {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.2s ease;
+  }
+
+  .footer-links a:hover {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  @media (max-width: 768px) {
+    .footer-content {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+</style>
