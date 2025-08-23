@@ -6,7 +6,17 @@ tags: ['performance', 'web-vitals', 'optimization', 'javascript']
 draft: false
 ---
 
+import OptimizedImage from '../../components/OptimizedImage.astro';
+import optimizedHero from '../../assets/optimized-image.jpg';
+
 # Building Performant Websites in 2024
+
+<OptimizedImage 
+  src={optimizedHero} 
+  alt="Performance optimization hero image - showcasing fast loading websites"
+  width={1200}
+  height={600}
+/>
 
 Website performance isn't just about making your site feel fast—it directly impacts user experience, conversion rates, and search engine rankings. In this post, I'll share the most effective techniques I've learned for building performant websites.
 
@@ -86,8 +96,46 @@ CLS measures visual stability:
 
 ### 1. Image Optimization
 
-Images often account for 60-70% of page weight:
+![Blog Image Example](/images/blog-image.jpg)
 
+Images often account for 60-70% of page weight. Here's a comparison of different approaches:
+
+**Optimized image with automatic WebP conversion and responsive sizing:**
+<OptimizedImage 
+  src={optimizedHero} 
+  alt="Optimized performance image example"
+  width={600}
+  height={300}
+/>
+
+Here are different ways to include images:
+
+**Simple markdown approach (static images):**
+```markdown
+![Alt text](/images/filename.jpg)
+```
+
+**HTML with more control:**
+```html
+<img src="/images/blog-image.jpg" alt="Blog example" width="600" height="300" loading="lazy">
+```
+
+**For optimized images in MDX blog posts:**
+```mdx
+---
+import OptimizedImage from '../../components/OptimizedImage.astro';
+import myImage from '../../assets/photo.jpg';
+---
+
+<OptimizedImage 
+  src={myImage} 
+  alt="Description"
+  width={800}
+  height={400}
+/>
+```
+
+**Traditional responsive images:**
 ```html
 <!-- Modern formats with fallbacks -->
 <picture>

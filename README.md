@@ -25,6 +25,45 @@ There's nothing special about `src/components/`, but that's where we like to put
 
 Any static assets, like images, can be placed in the `public/` directory.
 
+## 📷 Adding Images to Your Blog
+
+This project supports two approaches for handling images:
+
+### Static Images (Simple)
+Place images in `/public/images/` and reference them directly:
+
+```markdown
+![Alt text](/images/your-image.jpg)
+```
+
+Or with HTML for more control:
+```html
+<img src="/images/your-image.jpg" alt="Description" width="600" height="300" loading="lazy">
+```
+
+### Optimized Images (Recommended)
+Place images in `/src/assets/` and use the `OptimizedImage` component for automatic optimization:
+
+```astro
+---
+import OptimizedImage from '../components/OptimizedImage.astro';
+import myImage from '../assets/photo.jpg';
+---
+
+<OptimizedImage 
+  src={myImage} 
+  alt="Photo description"
+  width={800}
+  height={400}
+/>
+```
+
+The `OptimizedImage` component provides:
+- Automatic WebP format conversion
+- Responsive image sizes
+- Lazy loading
+- Proper aspect ratios
+
 ## 🧞 Commands
 
 All commands are run from the root of the project, from a terminal:
