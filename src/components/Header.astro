@@ -4,12 +4,22 @@ import { SITE_TITLE } from '../lib/config';
 ---
 
 <header class="header">
-  <nav class="nav container">
-    <a href="/" class="nav-logo">
-      {SITE_TITLE}
-    </a>
-    
-    <ThemeToggle />
+  <div class="top-nav container">
+    <div class="logo-container">
+      <a href="/" class="nav-logo">
+        {SITE_TITLE}
+      </a>
+    </div>
+    <div class="theme-toggle-container">
+      <ThemeToggle />
+    </div>
+  </div>
+  <nav class="bottom-nav container">
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/blog">Blog</a></li>
+      <li><a href="/about">About</a></li>
+    </ul>
   </nav>
 </header>
 
@@ -23,17 +33,36 @@ import { SITE_TITLE } from '../lib/config';
     backdrop-filter: blur(10px);
   }
 
-  .nav {
+  .top-nav {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: var(--space-md) var(--space-md);
-    min-height: 64px;
+    justify-content: center; /* Center the logo */
+    padding: var(--space-sm) var(--space-md);
+    min-height: 48px;
+    position: relative; /* For positioning the theme toggle */
+  }
+
+  .logo-container {
+    text-align: center;
+  }
+
+  .theme-toggle-container {
+    position: absolute;
+    right: var(--space-md);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .bottom-nav {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-sm) var(--space-md);
+    border-top: 1px solid var(--color-border);
   }
 
   .nav-logo {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
+    font-size: var(--font-size-xl);
+    font-weight: 700;
     color: var(--color-text);
     text-decoration: none;
   }
@@ -73,7 +102,7 @@ import { SITE_TITLE } from '../lib/config';
     }
     
     .nav-logo {
-      font-size: var(--font-size-base);
+      font-size: var(--font-size-lg);
     }
   }
 </style>

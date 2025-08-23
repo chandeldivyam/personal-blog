@@ -8,10 +8,59 @@ export interface Props {
   loading?: 'lazy' | 'eager';
   width?: number;
   height?: number;
+  variant?: 'hero' | 'content' | 'card' | 'full';
+  class?: string;
+  quality?: number;
 }
 
-const { src, alt, loading = 'lazy', width, height } = Astro.props;
+const { 
+  src, 
+  alt, 
+  loading = 'lazy', 
+  width, 
+  height,
+  variant = 'content',
+  class: className = '',
+  quality = 85
+} = Astro.props;
+
 const isStringPath = typeof src === 'string';
+
+// Different sizing strategies based on variant
+const getImageProps = () => {
+  switch(variant) {
+    case 'hero':
+      return {
+        widths: [640, 768, 1024, 1280, 1536],
+        sizes: '100vw',
+        quality: 90,
+        format: 'webp' as const
+      };
+    case 'card':
+      return {
+        widths: [320, 480, 640],
+        sizes: '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw',
+        quality: 80,
+        format: 'webp' as const
+      };
+    case 'full':
+      return {
+        widths: [640, 768, 1024, 1280, 1536, 1920],
+        sizes: '100vw',
+        quality: 85,
+        format: 'webp' as const
+      };
+    default: // content
+      return {
+        widths: [480, 768, 1200],
+        sizes: '(max-width: 768px) 100vw, 42rem',
+        quality: 80,
+        format: 'webp' as const
+      };
+  }
+};
+
+const imageProps = getImageProps();
 ---
 
 {isStringPath ? (
@@ -22,7 +71,7 @@ const isStringPath = typeof src === 'string';
     decoding="async"
     width={width}
     height={height}
-    class="optimized-image"
+    class={`optimized-image optimized-image--${variant} ${className}`}
   />
 ) : (
   <Image 
@@ -30,19 +79,44 @@ const isStringPath = typeof src === 'string';
     alt={alt}
     loading={loading}
     decoding="async"
-    format="webp"
-    quality={80}
+    format={imageProps.format}
+    quality={imageProps.quality}
     width={width}
     height={height}
-    widths={[480, 768, 1200]}
-    sizes="(max-width: 768px) 100vw, 42rem"
-    class="optimized-image"
+    widths={imageProps.widths}
+    sizes={imageProps.sizes}
+    class={`optimized-image optimized-image--${variant} ${className}`}
   />
 )}
 
 <style>
   .optimized-image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  
+  .optimized-image--content {
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-sm);
+    margin: var(--space-lg) 0;
+  }
+  
+  .optimized-image--hero {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .optimized-image--card {
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+  }
+  
+  .optimized-image--full {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 </style>
