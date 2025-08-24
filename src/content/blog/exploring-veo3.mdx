@@ -1,0 +1,163 @@
+---
+title: 'From Zero to Zeus: My 12-Hour Deep Dive into VEO3'
+description: 'What I learned going from complete video AI noob to creating my first commercial-style video with Google VEO3 in a single day'
+pubDate: 2025-08-03
+tags: ['video-ai', 'veo3', 'learning', 'ai-tools']
+draft: false
+heroImage: ../../assets/veo3-hero.jpeg
+---
+
+**TL;DR:** Nerded out on VEO3 for 12 hours straight. Went from complete video generation noob to creating a lightning-themed commercial concept for Zeus (our AI agent). The biggest lesson? It's still all about storytelling, but the mechanics of prompt engineering matter way more than I expected.
+
+## The Spark: A Puppy Commercial That Changed Everything
+
+I'll be honest - I had completely skipped VEO2. Not sure why, maybe I was too busy with other projects. But then I saw @PJaccetturo's puppy commercial, and something clicked. Here was this incredibly polished, emotional piece of video content that looked like it cost tens of thousands to produce, but was generated entirely with AI.
+
+That same day, I kept seeing people talking about JSON prompting for VEO3. Now, I've never seen major quality differences using JSON prompts with LLMs on our agent benchmarks, so I was skeptical. But curiosity won out, and I decided to spend a Saturday diving deep.
+
+## Down the Research Rabbit Hole
+
+My first stop was analyzing viral videos by [@Salmaaboukarr](https://x.com/Salmaaboukarr) and studying her prompting techniques. Then I stumbled across this [YouTube video](https://www.youtube.com/watch?v=afzbZYC6fCM) that became my unofficial VEO3 university. The key insight that blew my mind: **VEO3 creates 8-second videos with synced audio in ultra-realistic quality**. 
+
+But there had to be some trick to maintaining continuity across multiple clips. That's when I found Greg Isenberg's [podcast](https://x.com/gregisenberg/status/1927833297792516560), and he dropped the truth bomb that changed my whole perspective: 
+
+*"In the next 2 years, there's going to be a huge noise of cinematic videos, but great storytellers will come out on top. That's always been the case. It's all about the story!"*
+
+This hit different. The technology is impressive, but storytelling remains king.
+
+## The Two-Part Challenge
+
+I quickly realized there were two distinct problems to solve:
+
+### 1. Prompting Correctly 
+I discovered this incredible [repo by snubroot](https://github.com/snubroot/Veo-3-Meta-Framework/tree/main) with detailed prompting frameworks. I also dove into Google's official [documentation](https://ai.google.dev/gemini-api/docs/video?example=dialogue#element-examples) with tons of solid examples.
+
+Using Claude Code, I set up my own prompting system, created examples based on successful viral videos, and started building my prompt generation pipeline.
+
+### 2. Actually Using VEO3
+This is where reality hit. There are three places you can access VEO3:
+- Gemini Pro subscription (very limited generations) 
+- Gemini API (what I ended up using)
+- Vertex AI (for enterprise)
+
+**The hard truth: it's expensive.** You can't generate videos shorter than 8 seconds, and every experiment costs real money. But I figured for actual production-quality content, the cost per result would be reasonable.
+
+## Getting My Hands Dirty: The Technical Setup
+
+Here's the exact code I used to get started:
+
+```python
+import time
+from google import genai
+from google.genai import types
+from google.colab import userdata
+
+client = genai.Client(
+    api_key=userdata.get('GOOGLE_API_KEY')
+)
+
+operation = client.models.generate_videos(
+    model="veo-3.0-fast-generate-preview",
+    prompt=GENERATION_PROMPT,
+    config=types.GenerateVideosConfig(
+        negative_prompt="fake, poor quality, unrealistic"
+    )
+)
+
+# Waiting for the video(s) to be generated
+while not operation.done:
+    time.sleep(20)
+    operation = client.operations.get(operation)
+
+generated_video = operation.result.generated_videos[0]
+client.files.download(file=generated_video.video)
+timestamp = int(time.time())
+generated_video.video.save(f"veo3_video_{timestamp}.mp4")
+```
+
+A few key discoveries:
+- The **fast model ID is `veo-3.0-fast-generate-preview`** -- was not available anywhere in the documentation
+- Generation takes 2-3 minutes typically
+- The `negative_prompt` parameter is crucial for quality
+- You need to handle the async operation properly
+
+## The Zeus Vision: From Concept to Prompt
+
+Here's where it got interesting. I needed to brainstorm what would make sense for Zeus, our AI agent that helps with customer support and repetitive tasks. Zeus has this lightning theme, and I wanted something that would showcase transformation and power.
+
+After feeding all my research to Claude Code, here's the prompt it generated for my first video:
+
+```
+Subject: No human character - focus on object transformation from vintage mechanical typewriter to sleek modern computer with Zeus branding
+
+Action: Dramatic lightning bolt strikes down from above onto old typewriter, electrical energy courses through the machine causing rapid morphing and upgrading of components, keys dissolve and reshape into keyboard, mechanical parts transform into circuits and screens, computer screen powers on displaying "ZEUS" text in bold modern font, natural physics governing all transformation movements
+
+Scene: Dimly lit vintage office with wooden desk, ambient warm lighting initially, dramatic storm lighting during transformation, modern tech lighting emerges as computer forms, atmospheric shadows and highlights, final focus on illuminated computer screen
+
+Style: Cinematic wide shot transitioning to medium shot with camera positioned at desk level, slight camera push-in during transformation with final close-up on screen showing Zeus branding, dramatic lighting changes, professional cinematography with realistic physics
+
+Dialogue: None - pure visual transformation sequence
+
+Sounds: Initial quiet office ambiance, building thunder rumble, powerful lightning crack, electrical crackling and buzzing during transformation, mechanical sounds morphing into electronic hums, subtle computer startup chime as Zeus logo appears, no background music
+
+Technical: subtitles, captions, watermarks, unwanted text overlays, poor lighting, blurry footage, low resolution, artifacts, inconsistent transformation, amateur quality, unrealistic physics, choppy animation, distracting backgrounds
+```
+
+## The Result: Better Than Expected
+
+When I tried writing prompts myself initially, the quality was mediocre at best. But letting Claude Code generate the prompt based on all the guidelines and examples I'd collected? The result was surprisingly good.
+
+<blockquote class="twitter-tweet" data-media-max-width="560">
+  <p lang="en" dir="ltr">
+    Nerding out on veo3 today...
+  </p>
+  &mdash; Divyam Chandel (@divyamchandel) 
+  <a href="https://twitter.com/divyamchandel/status/1951723707992301885?ref_src=twsrc%5Etfw">
+    August 2, 2025
+  </a>
+</blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+The transformation looked cinematic, the lighting progression felt professional, and the Zeus branding moment had genuine impact. Not perfect, but definitely something I could see working in a real commercial context.
+
+## What I Learned (The Hard Way)
+
+### The Good Surprises:
+- **Audio generation is genuinely impressive** - the electrical crackling, thunder, and ambient sounds added so much atmosphere
+- **Prompt engineering makes a MASSIVE difference** - probably 80% of the quality difference comes from how you structure the request
+- **Claude Code is excellent at prompt generation** - much better than my manual attempts
+
+### The Painful Realities:
+- **8-second limit is brutal** for storytelling
+- **Cost adds up fast** when experimenting
+- **Character consistency across multiple clips remains challenging**
+- **You need multiple attempts** to get something usable
+- **The learning curve is steep** - casual use won't get you far
+
+### Technical Gotchas:
+- Specify audio explicitly or you get silent videos
+- Negative prompts are crucial for avoiding amateur-looking results
+- The model understands cinematographic terminology well
+- Simple, focused prompts often work better than complex layered descriptions
+
+## What's Next: The Full Zeus Commercial
+
+I'm planning to create a complete commercial narrative. Here's my concept:
+
+*A person finishes a tennis match, sits down, and sees 13 missed calls from their boss. They frantically call back. The boss is upset: "Where the hell are you in the middle of the work day? There have been so many support issues!" Just as Andrew starts to explain, an assistant cuts in: "Actually, all the issues have been resolved." The boss pauses: "Oh, so you were resolving everything. No worries, have a great day." Final frame: "Zeus - always there for you."*
+
+The challenge will be maintaining consistency across multiple scenes and managing character continuity - something the community consistently highlights as VEO3's biggest limitation.
+
+## The Bottom Line
+
+After 12 hours of experimentation, here's my honest take:
+
+**VEO3 is genuinely impressive** but requires serious commitment to master. It's not a casual tool you can dabble with - the cost structure and learning curve demand focused effort.
+
+**Storytelling still wins.** The technology enables incredible visuals, but the most viral content succeeds because of compelling narratives, not just technical quality.
+
+**Prompt engineering is a skill.** Like any powerful tool, VEO3 rewards expertise. The difference between a casual user and someone who understands the system deeply shows immediately in the output quality.
+
+For anyone curious about diving in: start with clear learning goals, budget for real experimentation costs, and focus on understanding the prompting framework before expecting professional results.
+
+The future where small teams can create commercial-quality video content is already here. But like any revolution, the winners will be those who master the new rules, not just those who have access to the tools.
