@@ -26,7 +26,16 @@ export default defineConfig({
     build: {
       cssMinify: 'lightningcss',
       rollupOptions: {
-        output: { assetFileNames: 'assets/[hash][extname]' }
+        output: { 
+          assetFileNames: 'assets/[hash][extname]',
+          // Force CSS into fewer chunks to reduce sequential loading
+          manualChunks: (id) => {
+            // Bundle all CSS into a single chunk
+            if (id.includes('.css') || id.includes('styles/')) {
+              return 'styles';
+            }
+          }
+        }
       }
     },
     server: {
