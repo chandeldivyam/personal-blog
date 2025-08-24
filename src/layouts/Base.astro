@@ -48,4 +48,10 @@ const { title, description, image } = Astro.props;
     flex: 1;
     padding: var(--space-lg);
   }
+
+  @media (max-width: 768px) {
+    .main {
+      padding: var(--space-sm);
+    }
+  }
 </style>
