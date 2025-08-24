@@ -24,36 +24,6 @@ const { headings } = Astro.props as any;
 
 <Base title={title} description={description} image={image}>
   <article class="container">
-    <header class="article-header">
-      <h1 class="article-title">{title}</h1>
-      <p class="article-description">{description}</p>
-      
-      <div class="article-meta">
-        <time datetime={pubDate.toISOString()}>
-          {formatDate(pubDate)}
-        </time>
-        <span class="separator">•</span>
-        <ReadingTime {...readTime} />
-        {updatedDate && (
-          <>
-            <span class="separator">•</span>
-            <span class="updated">
-              Updated: <time datetime={updatedDate.toISOString()}>
-                {formatDate(updatedDate)}
-              </time>
-            </span>
-          </>
-        )}
-      </div>
-      
-      {tags.length > 0 && (
-        <div class="article-tags">
-          {tags.map((tag) => (
-            <span class="tag">#{tag}</span>
-          ))}
-        </div>
-      )}
-    </header>
     
     <TableOfContents headings={headings} />
     
