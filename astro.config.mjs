@@ -3,8 +3,6 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 
-import cloudflare from '@astrojs/cloudflare';
-
 export default defineConfig({
   site: 'https://divyam.site',
 
@@ -33,7 +31,7 @@ export default defineConfig({
       }
     },
     server: {
-      allowedHosts: ['720a7673ec40.ngrok-free.app']
+      allowedHosts: ['divyam.site']
     }
   },
 });
