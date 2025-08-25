@@ -1,0 +1,91 @@
+<!-- public/offline.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - DC Blog</title>
+  <style>
+    :root {
+      --color-bg: #ffffff;
+      --color-text: #1a1a1a;
+      --color-accent: #cc3600;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg: #0a0a0a;
+        --color-text: #e5e5e5;
+      }
+    }
+    
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    .offline-container {
+      text-align: center;
+      max-width: 500px;
+    }
+    
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--color-accent);
+    }
+    
+    p {
+      font-size: 1.125rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+      opacity: 0.8;
+    }
+    
+    .offline-icon {
+      font-size: 5rem;
+      margin-bottom: 1rem;
+    }
+    
+    button {
+      background: var(--color-accent);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="offline-icon">📡</div>
+    <h1>You're Offline</h1>
+    <p>
+      It looks like you've lost your internet connection. 
+      You can still read any articles you've previously visited - they're saved locally!
+    </p>
+    <button onclick="window.location.reload()">Try Again</button>
+  </div>
+  
+  <script>
+    // Auto-reload when back online
+    window.addEventListener('online', () => {
+      window.location.reload();
+    });
+  </script>
+</body>
+</html>

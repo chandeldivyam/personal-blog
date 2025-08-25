@@ -14,7 +14,10 @@ export default defineConfig({
   ],
 
   // Enhanced prefetch configuration
-  prefetch: true,
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: 'viewport',
+  },
   markdown: {
     shikiConfig: {
       theme: 'github-dark-dimmed',
